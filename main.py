@@ -12,7 +12,7 @@ def start(message):
     markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
     btn1 = types.KeyboardButton("👋 Поздороваться")
     markup.add(btn1)
-    bot.send_message(message.from_user.id, "👋 Привет! Я твой бот-помошник!", reply_markup=markup)
+    bot.send_message(message.from_user.id, "👋 Привет! Я твой бот-помощник!", reply_markup=markup)
 
 
 @bot.message_handler(content_types=['text'])
@@ -24,9 +24,26 @@ def get_text_messages(message):
         bot.send_message(message.from_user.id, '❓ Выберите что-то из поля ниже', reply_markup=markup)
     elif message.text == 'Сделай идею':
         msg = bot.send_message(message.chat.id,
-                               f"Сколько должно быть идей?-->Что возьмём за идею?(писать через пробел)\n!!если идея состоит из двух слов, писать через тире!!\n Пример: 10 итоговый-проект")
+                               f"Сколько должно быть идей?-->Что возьмём за идею?(писать через пробел)\n❗Если идея состоит из двух слов, писать через тире❗\n Пример: 10 итоговый-проект")
         bot.register_next_step_handler(msg, gen)
-
+    elif message.text == 'Повторная генерация':
+        msg = bot.send_message(message.chat.id,
+                               f"Сколько должно быть идей?-->Что возьмём за идею?")
+        bot.register_next_step_handler(msg, gen)
+    elif message.text == 'Меню':
+        markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+        btn1 = types.KeyboardButton('Сделай идею')
+        markup.add(btn1)
+        bot.send_message(message.from_user.id, '❓ Выберите что-то из поля ниже', reply_markup=markup)
+    else:
+        bot.send_message(message.from_user.id, 'Привет! Чтобы начать работу напиши /start')
+def afterGen(message):
+    markup = types.ReplyKeyboardMarkup(resize_keyboard=True)
+    btn1 = types.KeyboardButton('Повторная генерация')
+    btn2 = types.KeyboardButton('Меню')
+    markup.add(btn2)
+    markup.add(btn1)
+    bot.send_message(message.from_user.id, 'Сделать повторную генерацию❓', reply_markup=markup)
 
 def gen(message):
     n, forinput = message.text.split()
@@ -64,7 +81,7 @@ def gen(message):
     finally:
         cursor.close()
         conn.close()
-
+        afterGen(message)
 
 bot.polling(none_stop=True)
 
